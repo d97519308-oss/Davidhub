@@ -1,15 +1,26 @@
-const express = require('express');
-const router = express.Router();
-const repoController = require('../controllers/repositoryController');
-const { auth } = require('../middleware/auth');
+/**
+ * Repository Routes
+ * CEO and Creator: David Adriano Ferrari dos Santos
+ */
 
-router.get('/', repoController.listRepositories);
-router.get('/:id', repoController.getRepository);
-router.post('/', auth, repoController.createRepository);
-router.put('/:id', auth, repoController.updateRepository);
-router.delete('/:id', auth, repoController.deleteRepository);
-router.post('/:id/collaborators', auth, repoController.addCollaborator);
-router.delete('/:id/collaborators/:userId', auth, repoController.removeCollaborator);
-router.get('/:id/collaborators', repoController.listCollaborators);
+const express = require('express');
+const repositoryController = require('../controllers/repositoryController');
+const { authenticateToken } = require('../middlewares/auth');
+
+const router = express.Router();
+
+// Public routes
+router.get('/', repositoryController.listRepositories.bind(repositoryController));
+router.get('/:id', repositoryController.getRepository.bind(repositoryController));
+
+// Protected routes
+router.post('/', authenticateToken, repositoryController.createRepository.bind(repositoryController));
+router.put('/:id', authenticateToken, repositoryController.updateRepository.bind(repositoryController));
+router.delete('/:id', authenticateToken, repositoryController.deleteRepository.bind(repositoryController));
+
+// Collaborators
+router.post('/:id/collaborators', authenticateToken, repositoryController.addCollaborator.bind(repositoryController));
+router.get('/:id/collaborators', repositoryController.listCollaborators.bind(repositoryController));
+router.delete('/:id/collaborators/:userId', authenticateToken, repositoryController.removeCollaborator.bind(repositoryController));
 
 module.exports = router;

@@ -1,13 +1,20 @@
-const express = require('express');
-const router = express.Router({ mergeParams: true });
-const pullController = require('../controllers/pullController');
-const { auth, optionalAuth } = require('../middleware/auth');
+/**
+ * Pull Requests Routes
+ * CEO and Creator: David Adriano Ferrari dos Santos
+ */
 
-router.get('/', optionalAuth, pullController.listPullRequests);
-router.get('/:pullId', pullController.getPullRequest);
-router.post('/', auth, pullController.createPullRequest);
-router.put('/:pullId', auth, pullController.updatePullRequest);
-router.post('/:pullId/merge', auth, pullController.mergePullRequest);
-router.post('/:pullId/close', auth, pullController.closePullRequest);
+const express = require('express');
+const pullController = require('../controllers/pullController');
+const { authenticateToken } = require('../middlewares/auth');
+
+const router = express.Router({ mergeParams: true });
+
+router.get('/', pullController.listPullRequests.bind(pullController));
+router.get('/:pullId', pullController.getPullRequest.bind(pullController));
+router.post('/', authenticateToken, pullController.createPullRequest.bind(pullController));
+router.put('/:pullId', authenticateToken, pullController.updatePullRequest.bind(pullController));
+router.post('/:pullId/merge', authenticateToken, pullController.mergePullRequest.bind(pullController));
+router.post('/:pullId/close', authenticateToken, pullController.closePullRequest.bind(pullController));
+router.delete('/:pullId', authenticateToken, pullController.deletePullRequest.bind(pullController));
 
 module.exports = router;
